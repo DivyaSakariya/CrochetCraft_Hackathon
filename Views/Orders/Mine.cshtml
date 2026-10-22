@@ -1,0 +1,3 @@
+@model List<CraftOrder>
+@{ViewData["Title"]="My Orders";}
+<h1 class="serif mb-4">My Orders</h1><div class="table-responsive panel"><table class="table align-middle"><thead><tr><th>Order</th><th>Product</th><th>Design</th><th>Total</th><th>Status</th><th>Payment</th></tr></thead><tbody>@foreach(var o in Model){<tr><td>#@o.Id</td><td>@o.Design?.Product?.Name</td><td>@o.Design?.Color / @o.Design?.Size</td><td>₹@o.Total</td><td><span class="badge bg-secondary">@o.Status</span></td><td>@o.PaymentStatus (COD)</td></tr>}</tbody></table>@if(!Model.Any()){<p>No orders yet.</p>}</div>

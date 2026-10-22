@@ -1,0 +1,1 @@
+// Shared site behaviors are intentionally minimal.

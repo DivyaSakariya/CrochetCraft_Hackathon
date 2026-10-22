@@ -1,0 +1,9 @@
+using CrochetCraft.Data;using CrochetCraft.Models;using Microsoft.AspNetCore.Mvc;using Microsoft.AspNetCore.Identity;using Microsoft.EntityFrameworkCore;
+namespace CrochetCraft.Controllers;
+public class AccountController(AppDbContext db):Controller {
+ [HttpGet] public IActionResult Login()=>View(new LoginVm());
+ [HttpPost,ValidateAntiForgeryToken] public async Task<IActionResult> Login(LoginVm vm){if(!ModelState.IsValid)return View(vm);var user=await db.Users.FirstOrDefaultAsync(x=>x.Email==vm.Email.Trim().ToLower());if(user==null||new PasswordHasher<AppUser>().VerifyHashedPassword(user,user.PasswordHash,vm.Password)==PasswordVerificationResult.Failed){ModelState.AddModelError("","Invalid email or password");return View(vm);}HttpContext.Session.SetInt32("UserId",user.Id);HttpContext.Session.SetString("Role",user.Role);HttpContext.Session.SetString("Name",user.Name);return RedirectToAction("Index",user.Role=="Admin"?"Admin":"Home");}
+ [HttpGet] public IActionResult Register()=>View(new RegisterVm());
+ [HttpPost,ValidateAntiForgeryToken] public async Task<IActionResult> Register(RegisterVm vm){if(!ModelState.IsValid)return View(vm);var email=vm.Email.Trim().ToLower();if(await db.Users.AnyAsync(x=>x.Email==email)){ModelState.AddModelError("Email","Email already registered");return View(vm);}var u=new AppUser{Name=vm.Name.Trim(),Email=email,Role="Customer"};u.PasswordHash=new PasswordHasher<AppUser>().HashPassword(u,vm.Password);db.Users.Add(u);await db.SaveChangesAsync();HttpContext.Session.SetInt32("UserId",u.Id);HttpContext.Session.SetString("Role",u.Role);HttpContext.Session.SetString("Name",u.Name);return RedirectToAction("Index","Home");}
+ [HttpPost,ValidateAntiForgeryToken] public IActionResult Logout(){HttpContext.Session.Clear();return RedirectToAction("Index","Home");}
+}

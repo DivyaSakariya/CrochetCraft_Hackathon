@@ -1,0 +1,3 @@
+using CrochetCraft.Data;using Microsoft.AspNetCore.Mvc;using Microsoft.EntityFrameworkCore;
+namespace CrochetCraft.Controllers;
+public class ShopController(AppDbContext db):Controller {public async Task<IActionResult> Index(string? category){var q=db.Products.Where(x=>x.Active);if(!string.IsNullOrWhiteSpace(category))q=q.Where(x=>x.Category==category);ViewBag.Category=category;return View(await q.OrderBy(x=>x.Name).ToListAsync());}}

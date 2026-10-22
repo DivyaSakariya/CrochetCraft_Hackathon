@@ -1,0 +1,7 @@
+using CrochetCraft.Models;
+using Microsoft.EntityFrameworkCore;
+namespace CrochetCraft.Data;
+public class AppDbContext(DbContextOptions<AppDbContext> options):DbContext(options) {
+ public DbSet<AppUser> Users=>Set<AppUser>(); public DbSet<Product> Products=>Set<Product>(); public DbSet<Material> Materials=>Set<Material>(); public DbSet<Design> Designs=>Set<Design>(); public DbSet<CraftOrder> Orders=>Set<CraftOrder>();
+ protected override void OnModelCreating(ModelBuilder b){base.OnModelCreating(b); b.Entity<AppUser>().HasIndex(x=>x.Email).IsUnique(); b.Entity<Product>().Property(x=>x.BasePrice).HasPrecision(12,2); b.Entity<Product>().Property(x=>x.YarnGrams).HasPrecision(12,2); b.Entity<Material>().Property(x=>x.StockGrams).HasPrecision(12,2);b.Entity<Material>().Property(x=>x.ReorderLevel).HasPrecision(12,2);b.Entity<Design>().Property(x=>x.UnitPrice).HasPrecision(12,2);b.Entity<Design>().Property(x=>x.YarnRequiredGrams).HasPrecision(12,2);b.Entity<CraftOrder>().Property(x=>x.Total).HasPrecision(12,2); b.Entity<Design>().HasOne(x=>x.Product).WithMany().HasForeignKey(x=>x.ProductId).OnDelete(DeleteBehavior.Restrict);b.Entity<CraftOrder>().HasOne(x=>x.Design).WithMany().HasForeignKey(x=>x.DesignId).OnDelete(DeleteBehavior.Restrict);b.Entity<CraftOrder>().HasOne(x=>x.User).WithMany().HasForeignKey(x=>x.UserId).OnDelete(DeleteBehavior.Restrict); }
+}
